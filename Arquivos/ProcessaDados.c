@@ -83,7 +83,6 @@ char menu()
             printf("Opcao: ( )\b\b");
             //fgets(buffer, 80, stdin); Por alguma razão que eu não sei(erro meu, talvez??), o código não funciona com fgets() nesse cenário.
             scanf(" %[^\n]", buffer);
-            printf("%s", buffer);
             if(strlen(buffer) == 1)
             {
                 if(buffer[0] >= 'A' && buffer[0] <= 'Z')
