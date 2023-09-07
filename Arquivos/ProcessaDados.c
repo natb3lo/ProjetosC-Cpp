@@ -21,52 +21,52 @@ struct _Cliente
     char primNome[MAX_STR];
     char ultNome[MAX_STR];
     float saldo;
+    int ativo;
 };
 
-
-void inicializa_clientes(CLIENTE[], int);
 char menu();
+void adicionar_registro(FILE*);
 
 
-
-int main()
+int main(int argc, char* argv[])
 {
     CLIENTE usuario[MAX_VET];
     char opcao;
-    //char ctrl;
-    inicializa_clientes(usuario, MAX_VET);
+    char* arquivOrigem;
+    FILE* arqPtr;
 
+    if(argc != 2)
+    {
+        fprintf(stderr, "Erro na chamada do comando.\n");
+        fprintf(stderr, "Entrada correta: [%s] [ARQUIVO.dat]");
+        exit(1);
+    }
+    
+    arquivOrigem = argv[1];
+    arqPtr = fopen(arquivOrigem, "rb+");
+    if(arqPtr == NULL)
+    {
+        fprintf(stderr, "Arquivo [%s] nao pode ser aberto para leitura.\n", arquivOrigem);
+        fprintf(stderr, "Certifique-se de fornecer o caminho correto para o diretorio. EX: C:Users\\MyDocuments\\MyLocalPath\\Myfile.dat");
+        exit(1);
+    }
+    
     do
     {
         opcao = menu();
-        printf("\nOpcao escolhida: %c", opcao);
+        switch(opcao)
+        {
+            case '+': adicionar_registro(arqPtr);
+            break;
+        }
 
-
+        rewind(arqPtr);
 
     }while(opcao != 'e');
 
-
-
-
-    /*--só pra testar o loop-----
-    for(int i=0; i<MAX_VET; i++)
-    {
-        printf("\n%d: %d", usuario[i].conta, i+1);
-    }
-    */
+    fclose(arqPtr);
 
     return 0;
-}
-
-void inicializa_clientes(CLIENTE usuario[], int tamanho)
-{
-    for(int i=0; i<tamanho; i++)
-    {
-        usuario[i].conta = 0;
-        memset(usuario[i].primNome, '\0', MAX_STR);
-        memset(usuario[i].ultNome, '\0', MAX_STR);
-        usuario[i].saldo = 0.0;
-    }
 }
 
 char menu()
@@ -97,4 +97,61 @@ char menu()
     } while(cond);
     
     return op;
+}
+
+void adicionar_registro(FILE* arqPtr)
+{
+    int numConta=0, cond=1;
+    CLIENTE clienteBuscado;
+    
+    if(arqPtr == NULL)
+    {
+        fprintf(stderr,"\nAbertura do Arquivo \"[registros.dat]\" falhou!");
+        fprintf(stderr,"\nPrograma encerrado.");
+        exit(1);
+    }
+
+    while(cond)
+    {
+        do
+        {
+            printf("\nNumero da Conta (1-1000): ");
+            scanf("%d", &numConta);
+        }while(numConta < 0 || numConta > MAX_VET);
+        printf("\nConta digitada: %d", numConta);
+        
+        fseek(arqPtr, (numConta-1)*sizeof(CLIENTE), SEEK_SET);
+        int lido = fread(&clienteBuscado, sizeof(CLIENTE), 1, arqPtr);
+        if(lido == 0)
+        {
+            fprintf(stderr, "Erro ao realizar leitura.");
+            continue;
+        }
+        printf("\n%d %s %s %f %d", clienteBuscado.conta, clienteBuscado.primNome, clienteBuscado.ultNome, clienteBuscado.saldo, clienteBuscado.ativo);
+        printf("\nLido: %d", lido);
+
+        if(clienteBuscado.ativo == 0)
+        {
+            clienteBuscado.conta = numConta;
+            printf("\nPrimeiro nome: ");
+            scanf(" %[^\n]", clienteBuscado.primNome);
+            char c = getchar();
+            printf("\nUltimo nome: ");
+            scanf(" %[^\n]", clienteBuscado.ultNome);
+            printf("\nSaldo: ");
+            scanf("%f", &clienteBuscado.saldo);
+            clienteBuscado.ativo = 1;
+        
+            fseek(arqPtr, (numConta-1)*sizeof(CLIENTE), SEEK_SET);
+            fwrite(&clienteBuscado, sizeof(CLIENTE), 1, arqPtr);
+            printf("\nRegistro Adicionado com Sucesso!");
+            cond = 0;
+        }
+        else
+        {
+            printf("\nRegistro ja existente!");
+        }
+        rewind(arqPtr);
+    }
+
 }
