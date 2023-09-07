@@ -1,2 +1,2 @@
 # Projetos C/C++
- Todos os projetos em C e C++ irão aqui
+ Todos os projetos nas linguagens C e C++ serão postados aqui.
