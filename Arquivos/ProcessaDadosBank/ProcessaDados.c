@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
             case '+': adicionar_registro(arqPtr);
             break;
             /*
-            ---->A adicionar as outras opções<----
+            ----> A adicionar as novas opções <----
             */
         }
 
@@ -135,45 +135,73 @@ void adicionar_registro(FILE* arqPtr)
 
         if(clienteBuscado.ativo == 0)
         {
-            clienteBuscado.conta = numConta;
-            printf("\nPrimeiro Nome: ");
-            scanf(" %[^\n]", clienteBuscado.primNome);
-            while(!(clienteBuscado.primNome[0] >= 'a' && clienteBuscado.primNome[0] <= 'z') && !(clienteBuscado.primNome[0] >= 'A' && clienteBuscado.primNome[0] <= 'Z'))
+            int loopCtrl = 1, check;
+            while(loopCtrl)
             {
-                printf("\nSomente letras sao permitidas para este campo!");
+                clienteBuscado.conta = numConta;
                 printf("\nPrimeiro Nome: ");
                 scanf(" %[^\n]", clienteBuscado.primNome);
-            }
-            char c = getchar();
-            printf("\nUltimo Nome: ");
-            scanf(" %[^\n]", clienteBuscado.ultNome);
-            while(!(clienteBuscado.ultNome[0] >= 'a' && clienteBuscado.ultNome[0] <= 'z') && !(clienteBuscado.ultNome[0] >= 'A' && clienteBuscado.ultNome[0] <= 'Z'))
-            {
-                printf("\nSomente letras sao permitidas para este campo!");
-                printf("\nUltimo Nome: ");
-                scanf(" %[^\n]", clienteBuscado.ultNome);
-            }
-            memset(buffer, '\0', 80);
-            while(!is_int)
-            {
-                printf("\nSaldo: ");
-                scanf(" %[^\n]", buffer);
-                ctrl = strlen(buffer);
-                for(i=0; i<=ctrl; i++)
+                check = 1;
+                
+                for(int i=0; clienteBuscado.primNome[i]; i++)
                 {
-                    if(!(buffer[i] >= '1' && buffer[i] <= '9') && (buffer[i] != '\0') && (buffer[i] != '.'))
+                    if(!(clienteBuscado.primNome[i] >= 'a' && clienteBuscado.primNome[i] <= 'z') && !(clienteBuscado.primNome[i] >= 'A' && clienteBuscado.primNome[i] <= 'Z'))
                     {
-                        memset(buffer, '\0', 80);
-                        printf("\nSomente numeros sao aceitos neste campo!");
-                        break;
-                    }
-                    if(i==ctrl)
-                    {
-                        is_int = 1;
+                        printf("\nSomente letras sao permitidas para este campo!");
+                        memset(clienteBuscado.primNome, '\0', MAX_STR);
+                        check = 0;
                         break;
                     }
                 }
+                if(check)
+                    loopCtrl = 0;
             }
+            char c = getchar(); //Tirar o '\n' do buffer
+            
+            loopCtrl = 1;
+            while(loopCtrl)
+            {
+                printf("\nUltimo Nome: ");
+                scanf(" %[^\n]", clienteBuscado.ultNome);
+                check = 1;
+
+                for(int i=0; clienteBuscado.ultNome[i]; i++)
+                {
+                    if(!(clienteBuscado.ultNome[i] >= 'a' && clienteBuscado.ultNome[i] <= 'z') && !(clienteBuscado.ultNome[i] >= 'A' && clienteBuscado.ultNome[i] <= 'Z'))
+                    {
+                        printf("\nSomente letras sao permitidas para este campo!");
+                        memset(clienteBuscado.primNome, '\0', MAX_STR);
+                        check = 0;
+                        break;
+                    }
+                }
+                if(check)
+                    loopCtrl = 0;
+            }
+
+
+            memset(buffer, '\0', 80);
+            loopCtrl = 1;
+            int is_int;
+            while(loopCtrl)
+            {
+                printf("\nSaldo: ");
+                scanf(" %[^\n]", buffer);
+                is_int = 1;
+                for(i=0; buffer[i]; i++)
+                {
+                    if(!(buffer[i] >= '0' && buffer[i] <= '9') && (buffer[i] != '.'))
+                    {
+                        memset(buffer, '\0', 80);
+                        printf("\nSomente numeros sao aceitos neste campo!");
+                        is_int = 0;
+                        break;
+                    }
+                }
+                if(is_int)
+                    loopCtrl = 0;
+            }
+
             clienteBuscado.saldo = atof(buffer);
             clienteBuscado.ativo = 1;
         
